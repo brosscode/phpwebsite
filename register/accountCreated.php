@@ -6,8 +6,6 @@
     </head>
     <body>
     Account Created.
-    <form action="login.php">
-    <input type="submit" value="Go To Login"></input>
-        </form>
+    <input type="submit" onclick="location.href = 'http://localhost/login/';" value="Go To Login"></input>
     </body>
 </html>
