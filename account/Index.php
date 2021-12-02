@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
 
     $userlogin = $_GET['uname'];
@@ -11,14 +9,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
 
     if (!isset($username)) {
         http_response_code(503);
-        $_SESSION['error_message1'] = "Invalid Credentials";
-        die("Invalid Credentials");
+        die();
     }
 
     if (!isset($userpassword)) {
-        http_response_code(503);
-        $_SESSION['error_message1'] = "Invalid Credentials";
-        die("Invalid Credentials");
+        http_response_code(503);      
+        die();
     }
 
     $sql = "SELECT pwd FROM accounts WHERE username=?";
@@ -32,12 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
     // create/check connection to database.
     $conn = mysqli_connect($servername,$username,$password,$dbname);
     if ($conn === false) {
-        die("Connection Failed.");
+        die();
     }
 
     if ($conn ->connect_error){
-        http_response_code(502);
-        die("Connection Failed.");
+        http_response_code(500);
+        die();
     }
     
     if($stmt = mysqli_prepare($conn,$sql)){
@@ -58,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
 
                     mysqli_stmt_bind_param($stmt,"s", $param_userlogin);
                     mysqli_stmt_execute($stmt);
-                    // look at the comment here FUCKER you need to not fuck this up AGAIN :FingerPointngDown:
                     $result = mysqli_stmt_get_result($stmt);
                     $row =  mysqli_stmt_num_rows($stmt);
 
@@ -67,21 +62,17 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
                     }
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
 
-                    echo $myJSON;
+                    return $myJSON;
                 }
             }
             else {
                 http_response_code(503);
-                $_SESSION['error_message1'] = "Invalid Credentials";
-                // header('Location: '.$_SERVER['PHP_SELF']);
-                die("Invalid Credentials");
+                die();
             }
         }
         else {
             http_response_code(503);
-            $_SESSION['error_message1'] = "Invalid Credentials";
-            // header('Location: '.$_SERVER['PHP_SELF']);
-            die("Invalid Credentials");
+            die();
         }
     }
 }
@@ -94,18 +85,15 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
     $userpassword = $_POST['pw'];
 
     if (!isset($username)) {
-        http_response_code(503);
-        $_SESSION['error_message1'] = "Invalid Credentials";
-        die("Invalid Credentials");
+        http_response_code(503);       
+        die();
     }
 
     if (!isset($userpassword)) {
-        http_response_code(503);
-        $_SESSION['error_message1'] = "Invalid Credentials";
-        die("Invalid Credentials");
+        http_response_code(503);        
+        die();
     }
 
-    // pretty sure this is not needed with the check below
     if(!empty($_POST['newEmail'])) {
         $newEmail = $_POST['newEmail'];
         $param_newEmail = $newEmail;
@@ -119,36 +107,26 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
     $param_userlogin = $userlogin;
     $param_password = $userpassword;
 
-    // validation of new information
-
     if (!empty($newPW)) {
         if (strlen($newPW) < 8 || strlen($newPW) > 255) {
             http_response_code(503);
-            $_SESSION['error_message1'] = "Invalid New Password";
-            // header('Location: '.$_SERVER['PHP_SELF']);
-            die("Invalid Credentials.");
+            die();
         }
     }
 
     if (empty($newEmail) && empty($newPW)){
         http_response_code(500);
-        $_SESSION['error_message2'] = "Enter Either a New Password or New Email.";
-        // header('Location: '.$_SERVER['PHP_SELF']);
-        die("No New Information Submitted.");
+        die();
     }
 
     if (!empty($newEmail) && strlen($newEmail) > 45) {
         http_response_code(500);
-        $_SESSION['error_message2'] = "New Email Invalid Length. 45 or Fewer Characters.";
-        // header('Location: '.$_SERVER['PHP_SELF']);
-        die("New Email Invalid Length. 45 or Fewer Characters.");
+        die();
     }
 
     if (!empty($newEmail) && !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
         http_response_code(400);
-        $_SESSION['error_message3'] = "New Email Malformed";
-        // header('Location: '.$_SERVER['PHP_SELF']);
-        die("New Email is Malformed.");
+        die();
     }
 
     // create connection
@@ -160,12 +138,12 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
     // create/check connection to database.
     $conn = mysqli_connect($servername,$username,$password,$dbname);
     if ($conn === false) {
-        die("Connection Failed.");
+        die();
     }
 
     if ($conn ->connect_error){
-        http_response_code(502);
-        die("Connection Failed.");
+        http_response_code(500);
+        die();
     }
 
     $sql = "SELECT pwd FROM accounts WHERE username=?";
@@ -209,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
                             }
                             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
     
-                            echo $myJSON;
+                            return $myJSON;
                         }
 
                     }
@@ -240,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
                             }
                             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
     
-                            echo $myJSON;
+                            return $myJSON;
                         }
                     }
                 }
@@ -268,23 +246,19 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
                             }
                             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
     
-                            echo $myJSON;
+                            return $myJSON;
                         }
                     }
                 }
             }
             else {
                 http_response_code(503);
-                $_SESSION['error_message1'] = "Invalid Credentials";
-                // header('Location: '.$_SERVER['PHP_SELF']);
-                die("Invalid Credentials.");
+                die();
             }
         }
         else {
             http_response_code(503);
-            $_SESSION['error_message1'] = "Invalid Credentials";
-            // header('Location: '.$_SERVER['PHP_SELF']);
-            die("Invalid Credentials.");
+            die();
         }
     }
 
@@ -300,15 +274,13 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
     $param_password = $userpassword;
 
     if (!isset($username)) {
-        http_response_code(503);
-        $_SESSION['error_message1'] = "Invalid Credentials";
-        die("Invalid Credentials");
+        http_response_code(503);      
+        die();
     }
 
     if (!isset($userpassword)) {
-        http_response_code(503);
-        $_SESSION['error_message1'] = "Invalid Credentials";
-        die("Invalid Credentials");
+        http_response_code(503);      
+        die();
     }
 
     // create connection
@@ -320,12 +292,12 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
     // create/check connection to database.
     $conn = mysqli_connect($servername,$username,$password,$dbname);
     if ($conn === false) {
-        die("Connection Failed.");
+        die();
     }
 
     if ($conn ->connect_error){
-        http_response_code(502);
-        die("Connection Failed.");
+        http_response_code(500);
+        die();
     }
 
     $sql = "SELECT pwd FROM accounts WHERE username=?";
@@ -356,7 +328,7 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
                     }
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
 
-                    echo $myJSON;
+                    return $myJSON;
                 }
 
                 $sql = "DELETE FROM accounts WHERE username=?";
@@ -370,16 +342,12 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
             }
             else {
                 http_response_code(503);
-                $_SESSION['error_message1'] = "Invalid Credentials";
-                // header('Location: '.$_SERVER['PHP_SELF']);
-                die("Invalid Credentials");
+                die();
             }
         }
         else {
             http_response_code(503);
-            $_SESSION['error_message1'] = "Invalid Credentials";
-            // header('Location: '.$_SERVER['PHP_SELF']);
-            die("Invalid Credentials");
+            die();
         }
         mysqli_stmt_close($stmt);
     }

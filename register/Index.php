@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -7,13 +6,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userpassword = $_POST['pw'];
 
     if (!isset($accountname) || strlen($accountname) < 6 || strlen($accountname) > 45) {
-        $_SESSION['error_message1'] = "Username Does Not Meet Length Requirements";
+        $error1 = "Username Does Not Meet Length Requirements";
     }
     if (!isset($userpassword) || strlen($userpassword) < 8 || strlen($userpassword) > 255) {
-        $_SESSION['error_message2'] = "Password Below Length Requirements";
+        $error2 = "Password Below Length Requirements";
     }
     if (!preg_match('/^[0-9A-Z]*([0-9][A-Z]|[A-Z][0-9])[0-9A-Z]*$/i', $userpassword)) {
-        $_SESSION['error_message3'] = "Password Invalid, Missing Character / Numeric";
+        $error3 = "Password Invalid, Missing Character / Numeric";
     }
 
     $emailPresent = false;
@@ -21,23 +20,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['email'])) {
         $emailPresent = true;
         $email = $_POST['email'];
-        // sanitize it first
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
-            $_SESSION['error_message4'] = "Invalid Email";
+            $error4 = "Invalid Email";
         }
     }
 
-    if (isset($_SESSION['error_message1']) || isset($_SESSION['error_message2']) || isset($_SESSION['error_message3']) || isset($_SESSION['error_message4'])) {
+    if (isset($error1) || isset($error2) || isset($error3) || isset($error4)) {
         http_response_code(400);
-        $_SESSION['error_message5'] = 'Please correct errors and submit again.';
-        // header('Location: '.$_SERVER['PHP_SELF']);
         die();
     }
 
     else {
+
         // create connection to database.
         $servername = "localhost";
         $password = file_get_contents("password.txt","r");
@@ -47,25 +44,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // create/check connection to database.
         $conn = mysqli_connect($servername,$username,$password,$dbname);
         if ($conn === false) {
-            http_response_code(502);
-            die("ERROR: Could not connect. " . mysqli_connect_error());
+            http_response_code(500);
+            die();
         }
 
         if ($conn ->connect_error){
-            http_response_code(502);
-            die("Oh No." . mysqli_connect_error());
+            http_response_code(500);
+            die();
         }
 
-        // set account name param
         $param_accountname = $accountname;
-        // take the username/email/password and run a check in the database for them.
-        // boolean for valid, check for variables using a prepared statment
+
         $sql = "SELECT * FROM accounts WHERE username=?";
 
-        // prepare failue
         if(!$stmt = mysqli_prepare($conn,$sql)){
             http_response_code(503);
-            echo 'sql statement failed';
             exit();
         }
         else{
@@ -81,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // check to see if there was a match for the name
             if ($row > 0) {
                 http_response_code(500);
-                $_SESSION['error_message6'] = "User already exists";
+                $error5 = "User already exists";
                 die();
             }
             mysqli_stmt_close($stmt);
@@ -90,12 +83,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 $sql = "SELECT * FROM accounts WHERE email=?";
 
-                // prepare failue
                 if(!$stmt = mysqli_prepare($conn,$sql)){
-                    echo 'sql statement failed';  
                     exit();
                 }
-                // did not fail again.
                 else {   
                     // query statement
                     mysqli_stmt_bind_param($stmt,"s",$param_email);
@@ -108,15 +98,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // check to see if there was a match for the email.
                     if($row > 0) {
                         http_response_code(500);
-                        $_SESSION['error_message7'] = "Email Invalid";
+                        $error6 = "Email Invalid";
                         die();
                     }
                 }
             }
             // add errors to if statement
-            if (isset($_SESSION['error_message6']) || isset($_SESSION['error_message7'])) {
+            if (isset($error5) || isset($error6)) {
                 http_response_code(500);
-                header('Location: '.$_SERVER['PHP_SELF']);
                 exit();
             }
 
@@ -131,7 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sql = "INSERT INTO accounts (username,email,pwd) VALUES (?,?,?)";
 
                     if(!$stmt = mysqli_prepare($conn,$sql)){
-                            echo 'sql statement failed';  
                             exit();
                     }
                     mysqli_stmt_bind_param($stmt,"sss",$param_accountname,$param_email,$param_userpassword);
@@ -142,7 +130,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sql = "INSERT INTO accounts (username,pwd) VALUES (?,?)";
 
                     if(!$stmt = mysqli_prepare($conn,$sql)){
-                            echo 'sql statement failed';  
                             exit();
                     }
                     mysqli_stmt_bind_param($stmt,"ss",$param_accountname,$param_userpassword);
@@ -151,13 +138,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // verify it worked
                 if(mysqli_stmt_execute($stmt)) {
                     $conn->close();
-                    
-                    header("Location: http://localhost/register/accountCreated.php");
                     exit();
                 } 
                 else {
-                    echo "Error: " . $sql . "<br>" . $conn->error;
-                    http_response_code(502);
+                    http_response_code(500);
                     $conn->close();
                 }
             }

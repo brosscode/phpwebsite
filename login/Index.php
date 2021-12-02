@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -27,12 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // create/check connection to database.
     $conn = mysqli_connect($servername,$username,$password,$dbname);
     if ($conn === false) {
-        die("ERROR: Could not connect. " . mysqli_connect_error());
+        die();
     }
 
     if ($conn ->connect_error){
         http_response_code(500);
-        exit("Oh No." . mysqli_connect_error());
+        exit();
     }
 
     $sql = "SELECT pwd FROM accounts WHERE username=?";
@@ -55,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     mysqli_stmt_bind_param($stmt,"s", $param_userlogin);
                     mysqli_stmt_execute($stmt);
-                    // look at the comment here FUCKER you need to not fuck this up AGAIN :FingerPointngDown:
                     $result = mysqli_stmt_get_result($stmt);
                     $row =  mysqli_stmt_num_rows($stmt);
 
@@ -64,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
 
-                    echo $myJSON;
+                    return $myJSON;
                 }
             }
             else {
