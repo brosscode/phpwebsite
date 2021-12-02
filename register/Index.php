@@ -6,10 +6,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $accountname = $_POST['uname'];
     $userpassword = $_POST['pw'];
 
-    if (empty($accountname) || strlen($accountname) < 6 || strlen($accountname) > 45) {
+    if (!isset($accountname) || strlen($accountname) < 6 || strlen($accountname) > 45) {
         $_SESSION['error_message1'] = "Username Does Not Meet Length Requirements";
     }
-    if (empty($userpassword) || strlen($userpassword) < 8 || strlen($userpassword) > 255) {
+    if (!isset($userpassword) || strlen($userpassword) < 8 || strlen($userpassword) > 255) {
         $_SESSION['error_message2'] = "Password Below Length Requirements";
     }
     if (!preg_match('/^[0-9A-Z]*([0-9][A-Z]|[A-Z][0-9])[0-9A-Z]*$/i', $userpassword)) {
