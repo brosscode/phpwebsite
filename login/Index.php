@@ -1,5 +1,7 @@
 <?php
 
+    // change isset to check for $_POST info in this case
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $userlogin = $_POST['uname'];
@@ -62,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
 
-                    return $myJSON;
+                    echo $myJSON;
                 }
             }
             else {

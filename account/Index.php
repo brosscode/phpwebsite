@@ -1,21 +1,21 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
+
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+
+    if (!isset($_GET['uname'])) {
+        http_response_code(503);
+        die();
+    }
+
+    if (!isset($_GET['pw'])) {
+        http_response_code(503);      
+        die();
+    }
 
     $userlogin = $_GET['uname'];
     $userpassword = $_GET['pw'];
     $param_userlogin = $userlogin;
     $param_password = $userpassword;
-
-
-    if (!isset($username)) {
-        http_response_code(503);
-        die();
-    }
-
-    if (!isset($userpassword)) {
-        http_response_code(503);      
-        die();
-    }
 
     $sql = "SELECT pwd FROM accounts WHERE username=?";
 
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && count($_GET) > 0) {
                     }
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
 
-                    return $myJSON;
+                    echo $myJSON;
                 }
             }
             else {
@@ -81,15 +81,17 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
 
     $_POST = json_decode(file_get_contents('php://input'), true);
 
-    $userlogin = $_POST['uname'];
-    $userpassword = $_POST['pw'];
-
-    if (!isset($username)) {
+    if(!isset($_POST)) {
         http_response_code(503);       
         die();
     }
 
-    if (!isset($userpassword)) {
+    if (!isset($_POST['uname'])) {
+        http_response_code(503);       
+        die();
+    }
+
+    if (!isset($_POST['pw'])) {
         http_response_code(503);        
         die();
     }
@@ -104,6 +106,8 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
         $param_newpw = $newPW;
     }
 
+    $userlogin = $_POST['uname'];
+    $userpassword = $_POST['pw'];
     $param_userlogin = $userlogin;
     $param_password = $userpassword;
 
@@ -187,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
                             }
                             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
     
-                            return $myJSON;
+                            echo $myJSON;
                         }
 
                     }
@@ -218,7 +222,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
                             }
                             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
     
-                            return $myJSON;
+                            echo $myJSON;
                         }
                     }
                 }
@@ -246,7 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
                             }
                             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
     
-                            return $myJSON;
+                            echo $myJSON;
                         }
                     }
                 }
@@ -268,20 +272,25 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
 
     $_POST = json_decode(file_get_contents('php://input'), true);
 
+    if(!isset($_POST)) {
+        http_response_code(503);      
+        die();
+    }
+
+    if (!isset($_POST['uname'])) {
+        http_response_code(503);      
+        die();
+    }
+
+    if (!isset($_POST['pw'])) {
+        http_response_code(503);      
+        die();
+    }
+
     $userlogin = $_POST['uname'];
     $userpassword = $_POST['pw'];
     $param_userlogin = $userlogin;
     $param_password = $userpassword;
-
-    if (!isset($username)) {
-        http_response_code(503);      
-        die();
-    }
-
-    if (!isset($userpassword)) {
-        http_response_code(503);      
-        die();
-    }
 
     // create connection
     $servername = "localhost";
@@ -328,7 +337,7 @@ if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
                     }
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT);
 
-                    return $myJSON;
+                    echo $myJSON;
                 }
 
                 $sql = "DELETE FROM accounts WHERE username=?";

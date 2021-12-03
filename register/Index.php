@@ -2,6 +2,8 @@
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    // change isset to check for $_POST info in this case
+
     $accountname = $_POST['uname'];
     $userpassword = $_POST['pw'];
 
